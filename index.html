@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ark Jester D. Yañez — Engineer</title>
+<meta name="description" content="Software developer, 12 years. Billing, meter reading, GIS, payroll and fleet systems for an electric cooperative in Bataan.">
+<meta name="color-scheme" content="dark">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap">
+
+<style>
+/* ==========================================================================
+   1. TOKENS
+   ========================================================================== */
+:root{
+  /* Ground — near-black with a green cast. Never #000. */
+  --bg:          #0A0C0A;
+  --bg-raise:    #121511;
+  --bg-card:     #0F120E;
+  --bg-sunk:     #070806;
+
+  /* Text — contrast measured against --bg */
+  --text:        #F2F5EF;   /* 17.7:1 */
+  --text-soft:   #A8AFA2;   /*  8.5:1 */
+  --text-faint:  #7E857A;   /*  5.0:1 — safe at 11px */
+
+  --line:        rgba(242, 245, 239, .09);
+  --line-strong: rgba(242, 245, 239, .17);
+
+  /* One accent: acid lime. 15:1 on --bg; --bg on accent is also 15:1. */
+  --accent:      #C8F32B;
+  --accent-deep: #A6CC1F;
+  --accent-wash: rgba(200, 243, 43, .10);
+  --focus:       #C8F32B;
+
+  /* Ambient atmosphere, not element glows. */
+  --glow-green:  rgba(150, 210, 45, .20);
+  --glow-warm:   rgba(190, 55, 95, .11);
+
+  --font-display: "Poppins", "Plus Jakarta Sans", ui-sans-serif, Helvetica, Arial, sans-serif;
+  --font-ui:      "Plus Jakarta Sans", ui-sans-serif, Helvetica, Arial, sans-serif;
+
+  /* Type scale — 1.25 minor third, fluid at the display end. */
+  --t-micro:  .625rem;
+  --t-label:  .6875rem;
+  --t-small:  .8125rem;
+  --t-body:   1rem;
+  --t-lede:   clamp(1.0625rem, 1.5vw, 1.25rem);
+  --t-h3:     clamp(1.25rem, 2vw, 1.5rem);
+  --t-h2:     clamp(2rem, 4.2vw, 3.25rem);
+  --t-h1:     clamp(2.75rem, 7vw, 5.5rem);
+
+  /* Spacing — 4px base, doubling. */
+  --s-1: .25rem;  --s-2: .5rem;   --s-3: .75rem;  --s-4: 1rem;
+  --s-5: 1.5rem;  --s-6: 2rem;    --s-7: 3rem;    --s-8: 4rem;
+
+  --shell:     min(1280px, 100% - 2rem);
+  --gutter:    clamp(1.5rem, 4vw, 3.5rem);
+  --section-y: clamp(4rem, 10vw, 7.5rem);
+  --pill:      999px;
+  --radius:    18px;
+  --ease:      cubic-bezier(.16, 1, .3, 1);
+}
+@media (min-width: 720px){ :root{ --shell: min(1280px, 100% - 3rem); } }
+
+/* ==========================================================================
+   2. RESET + BASE  (mobile-first throughout)
+   ========================================================================== */
+*, *::before, *::after{ box-sizing: border-box; }
+html{ -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce){ html{ scroll-behavior: auto; } }
+
+body{
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--t-body);
+  line-height: 1.65;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+h1, h2, h3, h4{
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -.035em;
+  line-height: 1.04;
+  margin: 0;
+  text-wrap: balance;
+}
+p{ margin: 0; text-wrap: pretty; }
+ul, ol, dl, dd{ margin: 0; padding: 0; }
+li{ list-style: none; }
+a{ color: inherit; text-decoration: none; }
+svg{ display: block; }
+img{ display: block; max-width: 100%; height: auto; }
+
+:focus-visible{
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.shell{ width: var(--shell); margin-inline: auto; position: relative; z-index: 1; }
+
+.skip{
+  position: fixed; top: var(--s-2); left: var(--s-2); z-index: 90;
+  transform: translateY(-180%);
+  background: var(--accent); color: var(--bg);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--pill);
+  font-size: var(--t-label); font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  transition: transform .25s var(--ease);
+}
+.skip:focus{ transform: translateY(0); }
+
+/* ==========================================================================
+   3. ATMOSPHERE — fixed, pointer-events:none, never inside a scroller
+   ========================================================================== */
+.field{ position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.field::before{
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 76px 76px;
+  opacity: .55;
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 20%, transparent 78%);
+          mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 20%, transparent 78%);
+}
+.field::after{
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 45% at 82% 8%,  var(--glow-green) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 40% at 12% 96%, var(--glow-warm)  0%, transparent 72%);
+}
+
+/* ==========================================================================
+   4. TYPE UTILITIES
+   ========================================================================== */
+.label{
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.label--accent{ color: var(--accent); }
+.lede{ font-size: var(--t-lede); line-height: 1.6; color: var(--text-soft); max-width: 46ch; }
+.prose{ color: var(--text-soft); max-width: 62ch; }
+.prose + .prose{ margin-top: 1.1em; }
+
+/* The reference's signature move: outline-only display text. */
+.outline{
+  color: transparent;
+  -webkit-text-stroke: 1.25px var(--text-soft);
+}
+@supports not ((-webkit-text-stroke: 1px #000)){
+  .outline{ color: var(--text-soft); }
+}
+
+/* Pills */
+.pill{
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--pill);
+  padding: .45rem .9rem;
+  font-size: var(--t-label); font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-soft);
+  background: var(--bg-raise);
+}
+.badge{
+  display: inline-block;
+  font-size: var(--t-micro); font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--text-soft);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--pill);
+  padding: .3rem .65rem .25rem;
+  line-height: 1;
+}
+.badges{ display: flex; flex-wrap: wrap; gap: var(--s-2); }
+
+.spark{ width: 15px; height: 15px; color: var(--accent); flex: none; }
+
+/* ==========================================================================
+   5. SECTION SCAFFOLD
+   ========================================================================== */
+.section{ padding-block: var(--section-y); border-top: 1px solid var(--line); }
+.sec-head{ margin-bottom: clamp(2.5rem, 5vw, 4rem); display: grid; gap: var(--s-4); }
+.sec-head h2{ font-size: var(--t-h2); }
+.sec-head__note{ font-size: .9375rem; color: var(--text-faint); max-width: 52ch; }
+
+/* ==========================================================================
+   6. STICKY NAV
+   ========================================================================== */
+.masthead{
+  position: sticky; top: 0; z-index: 40;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border-bottom: 1px solid transparent;
+  transition: border-color .35s var(--ease);
+}
+.masthead.is-stuck{ border-bottom-color: var(--line); }
+.masthead__in{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--s-4);
+  padding-block: var(--s-3);
+}
+.wordmark{ display: inline-flex; align-items: center; gap: var(--s-3); }
+.wordmark__mark{
+  width: 32px; height: 32px; flex: none;
+  border-radius: 9px;
+  background: var(--accent);
+  display: grid; place-items: center;
+  color: var(--bg);
+}
+.wordmark__mark svg{ width: 17px; height: 17px; }
+.wordmark__text{
+  font-family: var(--font-display);
+  font-size: .9375rem; font-weight: 700;
+  letter-spacing: .02em; text-transform: uppercase;
+}
+.wordmark__text i{
+  font-family: var(--font-ui);
+  font-weight: 300; font-style: italic;
+  letter-spacing: 0; text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.nav{ display: none; }
+@media (min-width: 900px){ .nav{ display: flex; align-items: center; gap: var(--s-6); } }
+.nav a{
+  font-size: var(--t-small); font-weight: 500;
+  color: var(--text-soft);
+  padding-block: var(--s-1);
+  position: relative;
+  transition: color .3s var(--ease);
+}
+.nav a::after{
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+  height: 1px; background: var(--accent);
+  transform: scaleX(0); transform-origin: right center;
+  transition: transform .4s var(--ease);
+}
+.nav a:hover{ color: var(--text); }
+.nav a:hover::after,
+.nav a[aria-current="true"]::after{ transform: scaleX(1); transform-origin: left center; }
+.nav a[aria-current="true"]{ color: var(--accent); }
+
+/* ==========================================================================
+   7. BUTTONS
+   ========================================================================== */
+.btn{
+  display: inline-flex; align-items: center; gap: var(--s-3);
+  font-family: var(--font-ui);
+  font-size: var(--t-small); font-weight: 700;
+  letter-spacing: .01em;
+  padding: .5rem .6rem .5rem 1.15rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--pill);
+  background: var(--accent); color: var(--bg);
+  cursor: pointer;
+  transition: transform .18s var(--ease), background-color .3s var(--ease), border-color .3s var(--ease);
+}
+.btn:hover{ background: var(--accent-deep); border-color: var(--accent-deep); }
+.btn:active{ transform: scale(.98); }
+.btn__disc{
+  width: 27px; height: 27px; flex: none;
+  border-radius: 50%;
+  background: var(--bg); color: var(--accent);
+  display: grid; place-items: center;
+  transition: transform .4s var(--ease);
+}
+.btn__disc svg{ width: 12px; height: 12px; }
+.btn:hover .btn__disc{ transform: rotate(45deg); }
+
+.btn--ghost{
+  background: transparent; color: var(--text);
+  border-color: var(--line-strong);
+  padding: .5rem 1.15rem;
+}
+.btn--ghost:hover{ background: var(--bg-raise); border-color: var(--text-faint); }
+
+/* ==========================================================================
+   8. HERO
+   ========================================================================== */
+.hero{
+  min-height: calc(100dvh - 3.5rem);
+  display: flex; align-items: center;
+  padding-block: clamp(3rem, 8vw, 5.5rem);
+}
+.hero__grid{ display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-7); width: 100%; }
+@media (min-width: 1000px){
+  .hero__grid{ grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: var(--gutter); align-items: center; }
+}
+.hero__hello{ margin-bottom: var(--s-5); }
+.hero h1{ font-size: var(--t-h1); }
+.hero h1 .name{ color: var(--accent); }
+.hero__line2{
+  display: flex; align-items: flex-start; gap: var(--s-3);
+  margin-top: var(--s-2);
+  font-family: var(--font-display);
+  font-size: var(--t-h1); font-weight: 700;
+  letter-spacing: -.035em; line-height: 1.04;
+}
+.hero__value{
+  margin-top: clamp(1.5rem, 3vw, 2rem);
+  font-size: var(--t-lede);
+  color: var(--text-soft);
+  max-width: 42ch;
+}
+.hero__cta{ display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: clamp(1.75rem, 3.5vw, 2.25rem); }
+
+.portrait{
+  border-radius: var(--radius);
+  border: 1px solid var(--line-strong);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background:
+    radial-gradient(circle at 70% 22%, var(--accent-wash) 0%, transparent 58%),
+    linear-gradient(160deg, var(--bg-raise) 0%, var(--bg-sunk) 100%);
+  display: grid; place-content: center; gap: var(--s-2);
+  text-align: center; padding: var(--s-6);
+  position: relative;
+}
+.portrait::after{
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
+  background-size: 14px 14px;
+  opacity: .5;
+}
+.portrait img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* ==========================================================================
+   9. MARQUEE
+   ========================================================================== */
+.marquee{
+  border-block: 1px solid var(--line);
+  overflow: hidden;
+  padding-block: var(--s-4);
+  background: var(--bg-sunk);
+  position: relative; z-index: 1;
+}
+.marquee__track{
+  display: flex; align-items: center; gap: var(--s-6);
+  width: max-content;
+  animation: slide 34s linear infinite;
+}
+.marquee:hover .marquee__track{ animation-play-state: paused; }
+.marquee__item{
+  display: inline-flex; align-items: center; gap: var(--s-3);
+  font-size: var(--t-label); font-weight: 600;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+@keyframes slide{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce){
+  .marquee__track{ animation: none; width: 100%; overflow-x: auto; }
+}
+
+/* ==========================================================================
+   10. CAPABILITY ROW — hairline-divided, no cards
+   ========================================================================== */
+.caps{ display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.caps > li{ padding-block: var(--s-5); border-top: 1px solid var(--line); }
+@media (min-width: 860px){
+  .caps{ grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--gutter); }
+  .caps > li + li{ padding-left: var(--gutter); border-left: 1px solid var(--line); }
+}
+.caps h3{
+  font-family: var(--font-ui);
+  font-size: var(--t-label); font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  margin-bottom: var(--s-3);
+}
+.caps p{ font-size: .9375rem; color: var(--text-soft); }
+
+/* ==========================================================================
+   11. ABOUT
+   ========================================================================== */
+.about{ display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
+@media (min-width: 1000px){ .about{ grid-template-columns: minmax(0, 1fr) minmax(0, .8fr); gap: var(--gutter); } }
+.facts{ border-top: 1px solid var(--line-strong); }
+.facts > div{
+  display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: var(--s-2) var(--s-5);
+  padding-block: var(--s-4);
+  border-bottom: 1px solid var(--line);
+}
+.facts dt{
+  font-size: var(--t-micro); font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-faint); padding-top: .3rem;
+}
+.facts dd{ font-size: .9375rem; color: var(--text-soft); }
+
+/* ==========================================================================
+   12. SKILLS
+   ========================================================================== */
+.matrix{ border-top: 1px solid var(--line-strong); }
+.matrix > div{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-2);
+  padding-block: var(--s-4);
+  border-bottom: 1px solid var(--line);
+}
+@media (min-width: 760px){
+  .matrix > div{
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    gap: var(--gutter);
+    align-items: baseline;
+  }
+}
+.matrix dt{
+  font-family: var(--font-ui);
+  font-size: var(--t-label); font-weight: 700;
+  letter-spacing: .11em; text-transform: uppercase;
+  color: var(--text);
+}
+.matrix dd{ font-size: .9375rem; color: var(--text-soft); }
+/* The two rows that are the actual differentiator, not just tooling. */
+.matrix > .is-key dt{ color: var(--accent); }
+
+/* ==========================================================================
+   13. PROJECTS — 2-column zig-zag, never three across
+   ========================================================================== */
+.projects{ display: grid; gap: clamp(3rem, 7vw, 5rem); }
+.project{ display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-5); align-items: center; }
+@media (min-width: 900px){
+  .project{ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--gutter); }
+  .project:nth-child(even) .project__media{ order: 2; }
+}
+
+/* Plate = CSS placeholder. Drop a real <img> in and it covers this. */
+.plate{
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: grid; place-content: center; gap: var(--s-2);
+  text-align: center; padding: var(--s-5);
+  background: var(--bg-card);
+}
+.plate img{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  /* UI screenshots carry their meaning at the top, so crop from the bottom. */
+  object-position: center top;
+}
+/* Once a real screenshot is in, the generated label underneath is redundant. */
+.plate.has-shot .plate__num,
+.plate.has-shot .plate__label{ display: none; }
+/* Portrait phone captures are shown whole rather than cropped to 16:10. */
+.plate--fit img{ object-fit: contain; object-position: center; padding: var(--s-4); }
+.plate__num{
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 3.75rem);
+  font-weight: 700; line-height: 1; letter-spacing: -.04em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.plate__label{
+  font-size: var(--t-micro); font-weight: 600;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--text-soft);
+}
+.plate::after{ content: ""; position: absolute; inset: 0; pointer-events: none; }
+
+.plate--01{ background: linear-gradient(150deg, var(--bg-raise) 0%, var(--bg-sunk) 100%); }
+.plate--01::after{
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.plate--02{ background: radial-gradient(circle at 26% 26%, var(--accent-wash) 0%, var(--bg-sunk) 62%); }
+.plate--02::after{
+  background-image: radial-gradient(var(--line-strong) 1.2px, transparent 1.2px);
+  background-size: 15px 15px;
+}
+.plate--03{ background: linear-gradient(105deg, var(--bg-sunk) 0%, var(--bg-raise) 55%, var(--accent-wash) 100%); }
+.plate--03::after{ background: repeating-linear-gradient(-45deg, transparent 0 10px, var(--line) 10px 11px); }
+.plate--04{ background: radial-gradient(circle at 74% 30%, var(--accent-wash) 0%, var(--bg-sunk) 60%); }
+.plate--04::after{
+  background: repeating-radial-gradient(circle at 74% 30%, transparent 0 18px, var(--line) 18px 19px);
+}
+.plate--05{ background: linear-gradient(200deg, var(--bg-raise) 0%, var(--bg-sunk) 70%); }
+.plate--05::after{
+  background: repeating-linear-gradient(90deg, transparent 0 5px, var(--line) 5px 6px);
+  opacity: .8;
+}
+.plate--06{ background: linear-gradient(35deg, var(--bg-sunk) 0%, var(--accent-wash) 55%, var(--bg-raise) 100%); }
+.plate--06::after{
+  background:
+    repeating-linear-gradient(45deg,  transparent 0 13px, var(--line) 13px 14px),
+    repeating-linear-gradient(-45deg, transparent 0 13px, var(--line) 13px 14px);
+}
+.plate--07{ background: radial-gradient(circle at 40% 60%, var(--accent-wash) 0%, var(--bg-sunk) 65%); }
+.plate--07::after{
+  background:
+    repeating-linear-gradient(0deg,  transparent 0 21px, var(--line) 21px 22px),
+    radial-gradient(var(--line-strong) 1.3px, transparent 1.3px);
+  background-size: auto, 22px 22px;
+}
+
+.project__body{ display: grid; gap: var(--s-4); }
+.project__eyebrow{ display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); align-items: baseline; }
+.project h3{ font-size: var(--t-h3); }
+.project__problem{ font-size: .9375rem; color: var(--text-soft); max-width: 52ch; }
+.project__result{
+  font-size: .9375rem; color: var(--text); max-width: 52ch;
+  padding-left: var(--s-4);
+  border-left: 2px solid var(--accent);
+}
+.project__links{ display: flex; flex-wrap: wrap; gap: var(--s-5); padding-top: var(--s-1); }
+.project__links a{
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  font-size: var(--t-small); font-weight: 600;
+  color: var(--accent);
+  box-shadow: inset 0 -1px 0 rgba(200, 243, 43, .4);
+  transition: box-shadow .3s var(--ease);
+}
+.project__links a:hover{ box-shadow: inset 0 -1px 0 var(--accent); }
+.project__links svg{ width: 12px; height: 12px; }
+
+/* ==========================================================================
+   14. TIMELINE
+   ========================================================================== */
+.timeline{ border-top: 1px solid var(--line-strong); }
+.timeline li{
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-2);
+  padding-block: var(--s-5);
+  border-bottom: 1px solid var(--line);
+}
+@media (min-width: 760px){
+  .timeline li{ grid-template-columns: 9.5rem minmax(0, 1fr); gap: var(--gutter); align-items: baseline; }
+}
+.timeline h3{ font-family: var(--font-ui); font-size: 1.0625rem; font-weight: 700; }
+.timeline__where{
+  font-size: var(--t-micro); font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent); margin-top: var(--s-1);
+}
+.timeline p{ font-size: .9375rem; color: var(--text-soft); margin-top: var(--s-3); max-width: 58ch; }
+
+/* ==========================================================================
+   15. CONTACT FOOTER
+   ========================================================================== */
+.contact{ background: var(--bg-sunk); border-top: 1px solid var(--line); position: relative; z-index: 1; }
+.contact__in{ padding-block: var(--section-y); }
+.contact__grid{ display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
+@media (min-width: 900px){ .contact__grid{ grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: var(--gutter); } }
+.contact h2{ font-size: var(--t-h2); }
+.contact__mail{
+  display: inline-block;
+  margin-top: var(--s-5);
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.6vw, 1.875rem);
+  font-weight: 700; letter-spacing: -.03em;
+  color: var(--accent);
+  word-break: break-word;
+  box-shadow: inset 0 -2px 0 rgba(200, 243, 43, .35);
+  transition: box-shadow .3s var(--ease);
+}
+.contact__mail:hover{ box-shadow: inset 0 -3px 0 var(--accent); }
+.links{ border-top: 1px solid var(--line-strong); }
+.links a{
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  padding-block: var(--s-4);
+  border-bottom: 1px solid var(--line);
+  font-weight: 500;
+  transition: color .3s var(--ease);
+}
+.links a:hover{ color: var(--accent); }
+.links svg{ width: 14px; height: 14px; flex: none; transition: transform .4s var(--ease); }
+.links a:hover svg{ transform: translate(3px, -3px); }
+.links__handle{ font-size: var(--t-small); color: var(--text-faint); }
+
+.available{
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  margin-top: var(--s-5);
+  font-size: var(--t-label); font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--text-soft);
+}
+.available::before{
+  content: ""; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent);
+  animation: breathe 2.6s var(--ease) infinite;
+}
+@keyframes breathe{
+  0%, 100%{ opacity: 1; transform: scale(1); }
+  50%     { opacity: .3; transform: scale(.7); }
+}
+
+.colophon{
+  border-top: 1px solid var(--line-strong);
+  padding-block: var(--s-6) var(--s-7);
+  display: flex; flex-wrap: wrap; gap: var(--s-4) var(--s-6);
+  justify-content: space-between; align-items: baseline;
+}
+
+/* ==========================================================================
+   16. MOTION
+   ========================================================================== */
+[data-reveal]{
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .7s var(--ease), transform .7s var(--ease);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+[data-reveal].is-in{ opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  [data-reveal]{ opacity: 1; transform: none; }
+}
+</style>
+
+</head>
+<body>
+
+<a class="skip" href="#work">Skip to work</a>
+<div class="field" aria-hidden="true"></div>
+
+<header class="masthead" id="masthead">
+  <div class="shell masthead__in">
+    
+    <a class="wordmark" href="#top">
+      <span class="wordmark__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 3h8a9 9 0 0 1 0 18H4V3zm5 4v10h3a5 5 0 0 0 0-10H9z"/></svg>
+      </span>
+      <span class="wordmark__text">Ark Jester<i>Yañez</i></span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="#about" data-nav="about">About</a>
+      <a href="#skills" data-nav="skills">Skills</a>
+      <a href="#work" data-nav="work">Work</a>
+      <a href="#experience" data-nav="experience">Experience</a>
+    </nav>
+    <a class="btn" href="#contact">
+      Book a call
+      <span class="btn__disc" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12L12 4M5 4h7v7"/></svg>
+      </span>
+    </a>
+  </div>
+</header>
+
+<span id="stick-sentinel" aria-hidden="true"></span>
+
+<main id="top">
+
+  
+  <section class="hero shell" aria-label="Introduction">
+    <div class="hero__grid">
+      <div>
+        <p class="pill hero__hello" data-reveal style="--i:0">12 years in software</p>
+
+        <h1 data-reveal style="--i:1">I'm <span class="name">Ark Jester</span>,</h1>
+        <p class="hero__line2" data-reveal style="--i:2">
+          <span class="outline">Software Developer</span>
+          <svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg>
+</p>
+
+        <p class="hero__value" data-reveal style="--i:3">
+          Twelve years building the systems electric cooperatives run on — billing, meter
+          reading, collection — from VB6 on the desk to DLMS/COSEM at the meter. Lately,
+          the AI infrastructure that sits on top of that data.
+</p>
+
+        <div class="hero__cta" data-reveal style="--i:4">
+          <a class="btn" href="#work">
+            See the work
+            <span class="btn__disc" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12L12 4M5 4h7v7"/></svg>
+            </span>
+          </a>
+          <a class="btn btn--ghost" href="#contact">Get in touch</a>
+        </div>
+      </div>
+
+      <div data-reveal style="--i:5">
+        
+        <div class="portrait">
+          <span class="label">Portrait</span>
+          <span class="label" style="color:var(--text-faint)">4:5 — drop your photo here</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    <span class="marquee__item">Billing systems<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">Meter reading<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">AMI / HES integration<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">DLMS / COSEM<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">ASP.NET Core &amp; Laravel<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">RAG &amp; local LLM<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">Billing systems<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">Meter reading<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">AMI / HES integration<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">DLMS / COSEM<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">ASP.NET Core &amp; Laravel<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">RAG &amp; local LLM<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+  </div>
+</div>
+
+<div class="shell">
+  <ul class="caps">
+    <li><h3>Systems that must reconcile</h3><p>Billing, meter reading and collection for electric cooperatives — where the output is money and it has to be right.</p></li>
+    <li><h3>Down to the meter</h3><p>AMI/HES and DLMS/COSEM integration, RAP data exchange and SMS gateways, not just the screens above them.</p></li>
+    <li><h3>New work on old foundations</h3><p>Laravel, ASP.NET Core, FastAPI and Flutter built beside VB6 that is still in daily production.</p></li>
+  </ul>
+</div>
+
+  
+  <section class="section" id="about" aria-labelledby="about-h">
+    <div class="shell">
+      <div class="sec-head">
+        <p class="label label--accent">About</p>
+        <h2 id="about-h">How I got here, and what I'm useful for.</h2>
+      </div>
+
+      <div class="about">
+        <div>
+          <p class="prose">
+            Twelve years building enterprise systems for electric cooperatives — billing,
+            meter reading, collection, network GIS, payroll and fleet. In practice I have
+            been solving the same two problems that entire time, across two generations of
+            hardware: get an accurate reading out of the field, and turn it into a bill that
+            reconciles. Windows Mobile handhelds became Android; VB6 gained C# and .NET
+            beside it; the problem did not change.
+</p>
+          <p class="prose">
+            On the data side it is Microsoft SQL Server — design, stored procedures, query
+            optimization, and snapshot and merge replication keeping instances in step on
+            local infrastructure rather than in the cloud. Around that sits the integration
+            work utilities actually need: AMI/HES, DLMS/COSEM, RAP data exchange, SMS
+            gateways. More recently I have been building
+            AI infrastructure around that data: local LLMs with Ollama, RAG over a vector
+            database, and agents in Python and FastAPI.
+</p>
+        </div>
+
+        <dl class="facts">
+          <div><dt>Experience</dt><dd>12 years, software development</dd></div>
+          <div><dt>Domain</dt><dd>Electric cooperative &amp; utility systems</dd></div>
+          <div><dt>Sectors</dt><dd>Electric cooperatives, water districts</dd></div>
+          <div><dt>Core stack</dt><dd>VB6, VB.NET, ASP.NET Core, Laravel, FastAPI</dd></div>
+          <div><dt>Data</dt><dd>Microsoft SQL Server, on-premise replication</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="section" id="skills" aria-labelledby="skills-h">
+    <div class="shell">
+      <div class="sec-head">
+        <p class="label label--accent">Skills</p>
+        <h2 id="skills-h">What I work with, grouped by job.</h2>
+        <p class="sec-head__note">The rows in lime are the ones that separate this from a general web CV.</p>
+      </div>
+
+      <dl class="matrix">
+        <div><dt>Programming</dt><dd>VB6, VB.NET, C#, PHP, JavaScript, Python, SQL</dd></div>
+        <div><dt>Backend</dt><dd>PHP, Laravel, ASP.NET Core, REST API, FastAPI</dd></div>
+        <div><dt>Frontend</dt><dd>HTML5, CSS3, JavaScript, Bootstrap, Tailwind CSS</dd></div>
+        <div><dt>Database</dt><dd>Microsoft SQL Server, MySQL, SQLite, database design, query optimization, stored procedures</dd></div>
+        <div><dt>Mobile</dt><dd>Flutter, React Native</dd></div>
+        <div><dt>System architecture</dt><dd>Clean Architecture, Repository Pattern, REST API, WebSocket, modular systems</dd></div>
+        <div class="is-key"><dt>Integration</dt><dd>API integration, data exchange, SMS gateway, AMI/HES integration, DLMS/COSEM</dd></div>
+        <div><dt>AI development</dt><dd>LLM integration, local AI, Ollama, Claude API, OpenAI API, Gemini API, RAG, vector database</dd></div>
+        <div><dt>AI infrastructure</dt><dd>Python, FastAPI, ChromaDB, local LLM / GGUF, AI agents</dd></div>
+        <div><dt>Automation</dt><dd>Process automation, scheduled jobs, n8n, automated data processing</dd></div>
+        <div><dt>Enterprise systems</dt><dd>Billing, meter reading, SOA, collection, vehicle, kiosk, reporting systems</dd></div>
+        <div class="is-key"><dt>Government / utility</dt><dd>Electric cooperative systems, meter reading, billing, RAP / data exchange, operational systems</dd></div>
+        <div class="is-key"><dt>Data replication</dt><dd>On-premise snapshot and merge replication across SQL Server instances</dd></div>
+        <div><dt>Tools</dt><dd>Visual Studio, VS Code, Git, GitHub, XAMPP, SQL Server Management Studio</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  
+  <section class="section" id="work" aria-labelledby="work-h">
+    <div class="shell">
+      <div class="sec-head">
+        <p class="label label--accent">Selected work</p>
+        <h2 id="work-h">Seven systems in production at a utility.</h2>
+        <p class="sec-head__note">
+          Meter to bill, pole to payroll. Each one below is running; the lime line on
+          each is the outcome only you can fill in.
+</p>
+      </div>
+
+      <div class="projects">
+
+        <article class="project" data-reveal>
+          <div class="project__media">
+            <div class="plate plate--01 plate--fit has-shot">
+              <span class="plate__num">01</span>
+              <span class="plate__label">Penelco MRBS</span>
+              <img src="images/mrbs.jpg" width="725" height="1600" loading="lazy" decoding="async"
+                   alt="Penelco MRBS home screen: bill month 202606, 1,263 total consumers with 1,263 pending, and the Read and Bill module.">
+            </div>
+          </div>
+          <div class="project__body">
+            <div class="project__eyebrow">
+              <p class="label">Peninsula Electric Cooperative</p>
+              <p class="label">Android</p>
+            </div>
+            <h3>Meter Reading &amp; Billing System</h3>
+            <p class="project__problem">
+              The field app readers carry house to house. Opens on the bill month with
+              total, read and pending consumer counts — 1,263 on the route shown — then
+              takes the reading and computes the bill on the spot. Field findings are
+              logged against the consumer, and the day exports to a transactions file
+              with local backup and restore behind it.
+</p>
+          </div>
+        </article>
+
+        <article class="project" data-reveal>
+          <div class="project__media">
+            <div class="plate plate--02 has-shot">
+              <span class="plate__num">02</span>
+              <span class="plate__label">Billing &amp; Collection</span>
+              <img src="images/billing.jpg" width="1600" height="923" loading="lazy" decoding="async"
+                   alt="The Total Utilities Billing System toolbar: charges, consumers, gateway, reading, commit, print bill, posting, collection, remit, ledger and adjustment.">
+            </div>
+          </div>
+          <div class="project__body">
+            <div class="project__eyebrow">
+              <p class="label">Peninsula Electric Cooperative</p>
+              <p class="label">Desktop</p>
+            </div>
+            <h3>Total Utilities Billing System</h3>
+            <p class="project__problem">
+              The desktop system the billing cycle actually runs on, integrated directly with
+              the Android meter reading app above. Charges, consumers and the meter gateway
+              feed reading and commit; then print bill, posting, collection, remittance,
+              ledger and adjustment — the full path from a field reading to money received
+              and reconciled.
+</p>
+            <p class="label">VB6 · Microsoft SQL Server</p>
+          </div>
+        </article>
+
+        <article class="project" data-reveal>
+          <div class="project__media">
+            <div class="plate plate--03 has-shot">
+              <span class="plate__num">03</span>
+              <span class="plate__label">PENELCO GIS</span>
+              <img src="images/gis.jpg" width="1600" height="764" loading="lazy" decoding="async"
+                   alt="PENELCO GIS field map showing fiber poles, server nodes, substations and 69 kV lines across Bataan, with a live network telemetry panel.">
+            </div>
+          </div>
+          <div class="project__body">
+            <div class="project__eyebrow">
+              <p class="label">Peninsula Electric Cooperative</p>
+              <p class="label">Bataan</p>
+            </div>
+            <h3>Distribution network GIS</h3>
+            <p class="project__problem">
+              Every asset on the network, on one map: 1,504 fiber poles, 27 substations and
+              1,449 69&nbsp;kV nodes, with cable routes and province, municipality and
+              barangay boundaries. Poles are graded good through critical, so the map doubles
+              as a maintenance queue. A live telemetry panel tracks uptime, system load,
+              throughput and servers up.
+</p>
+            <p class="label">Google Maps</p>
+          </div>
+        </article>
+
+        <article class="project" data-reveal>
+          <div class="project__media">
+            <div class="plate plate--04 has-shot">
+              <span class="plate__num">04</span>
+              <span class="plate__label">Bataan Tracking</span>
+              <img src="images/tracking.jpg" width="1600" height="895" loading="lazy" decoding="async"
+                   alt="Bataan Tracking live map with crew positions across the province, per-town radio channel controls, track history and a boundary crossing log.">
+            </div>
+          </div>
+          <div class="project__body">
+            <div class="project__eyebrow">
+              <p class="label">Peninsula Electric Cooperative</p>
+              <p class="label">Web</p>
+            </div>
+            <h3>Personnel tracking with dispatch radio</h3>
+            <p class="project__problem">
+              A live map of crews across the Bataan service area, each one carrying a state —
+              working, on break, emergency, inactive, off duty. Main office monitors every
+              channel and holds to talk into a single town, so only that crew hears the reply.
+              Track history replays a person's day, and boundary crossings are logged as crews
+              move between municipalities.
+</p>
+            <p class="label">Leaflet · OpenStreetMap</p>
+          </div>
+        </article>
+
+        <article class="project" data-reveal>
+          <div class="project__media">
+            <div class="plate plate--05 has-shot">
+              <span class="plate__num">05</span>
+              <span class="plate__label">PENELCO Payroll</span>
+              <img src="images/payroll.jpg" width="1600" height="814" loading="lazy" decoding="async"
+                   alt="PENELCO Payroll dashboard for the September 2026 first half period: 309 employees, net pay, statutory deductions and department readiness bars.">
+            </div>
+          </div>
+          <div class="project__body">
+            <div class="project__eyebrow">
+              <p class="label">Peninsula Electric Cooperative</p>
+              <p class="label">Web</p>
+            </div>
+            <h3>Semi-monthly payroll</h3>
+            <p class="project__problem">
+              Runs the cooperative's payroll for 309 employees on a first-half and second-half
+              cycle. Computes gross to net with withholding tax, SSS, PhilHealth and Pag-IBIG,
+              tracks readiness department by department, and blocks the period from locking
+              while rows still need attention — missing monthly rates are named, not just
+              counted. Withholding tax remittance runs off the same register.
+</p>
+          </div>
+        </article>
+
+        <article class="project" data-reveal>
+          <div class="project__media">
+            <div class="plate plate--06 has-shot">
+              <span class="plate__num">06</span>
+              <span class="plate__label">Document Management</span>
+              <img src="images/documents.jpg" width="1600" height="806" loading="lazy" decoding="async"
+                   alt="PENELCO document management showing versioned PDFs with their review status, type and tag filters, and a storage summary.">
+            </div>
+          </div>
+          <div class="project__body">
+            <div class="project__eyebrow">
+              <p class="label">Peninsula Electric Cooperative</p>
+              <p class="label">Runs local</p>
+            </div>
+            <h3>Document management and review workflow</h3>
+            <p class="project__problem">
+              Versioned document store with a review trail — each file carries its version and
+              who checked it. Documents are filtered by type and tag, routed through a request
+              and approval workflow, and watched by monitoring and analytics views. Runs on
+              local infrastructure rather than a cloud tenant.
+</p>
+          </div>
+        </article>
+
+        <article class="project" data-reveal>
+          <div class="project__media">
+            <div class="plate plate--07 has-shot">
+              <span class="plate__num">07</span>
+              <span class="plate__label">FleetSystem</span>
+              <img src="images/fleet.jpg" width="1600" height="810" loading="lazy" decoding="async"
+                   alt="FleetSystem executive dashboard: 215 running vehicles, fuel and maintenance cost panels, and a vehicle status breakdown.">
+            </div>
+          </div>
+          <div class="project__body">
+            <div class="project__eyebrow">
+              <p class="label">Peninsula Electric Cooperative</p>
+              <p class="label">Web</p>
+            </div>
+            <h3>Fleet and maintenance management</h3>
+            <p class="project__problem">
+              Tracks 215 running vehicles from master data through daily operation — drivers,
+              assignments and trip tickets on one side; fuel monitoring, stations and cost
+              reports on the other. Maintenance carries preventive schedules, suppliers and
+              mechanics, with registration, insurance, battery and tire replacement surfaced
+              as things coming due rather than things already missed.
+</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+  
+  <section class="section" id="experience" aria-labelledby="exp-h">
+    <div class="shell">
+      <div class="sec-head">
+        <p class="label label--accent">Experience</p>
+        <h2 id="exp-h">Twelve years, two companies.</h2>
+      </div>
+
+      <ol class="timeline">
+        <li>
+          <p class="label">2019 — present</p>
+          <div>
+            <h3>Database Administrator / Software Developer</h3>
+            <p class="timeline__where">Peninsula Electric Cooperative Inc.</p>
+            <p>Database administration and in-house development for an electric cooperative.
+              Every system on this page is currently mine — billing and collection, meter
+              reading, network GIS, personnel tracking, payroll, document management and
+              fleet — along with the SQL Server they all sit on.</p>
+          </div>
+        </li>
+        <li>
+          <p class="label">2014 — 2019</p>
+          <div>
+            <h3>Programmer</h3>
+            <p class="timeline__where">Digital Data Corporation</p>
+            <p>Billing systems in VB6 and later C# on .NET, plus meter reading applications
+              for Windows Mobile handhelds, built for electric cooperatives and water
+              districts. The same problem I work on today, one generation of hardware
+              earlier.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer class="contact" id="contact">
+  <div class="shell contact__in">
+    <div class="sec-head">
+      <p class="label label--accent">Contact</p>
+      <h2>Tell me what's breaking.</h2>
+      <p class="sec-head__note">
+        A sentence about the actual problem gets a faster and more useful reply than a
+        paragraph about the company.
+</p>
+    </div>
+
+    <div class="contact__grid">
+      <div>
+        <p class="prose">Best reached by email. I read everything and reply to anything specific.</p>
+        <a class="contact__mail" href="mailto:arkyanez.07@gmail.com">arkyanez.07@gmail.com</a>
+        <p class="available">Available for work</p>
+      </div>
+
+      <ul class="links">
+        <li><a href="https://github.com/ArkJester07" rel="me noopener">
+          <span>GitHub</span><span class="links__handle">@ArkJester07</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 11L11 5M6 5h5v5"/></svg></a></li>
+        <li><a href="mailto:arkyanez.07@gmail.com">
+          <span>Email</span><span class="links__handle">arkyanez.07@gmail.com</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 11L11 5M6 5h5v5"/></svg></a></li>
+      </ul>
+    </div>
+
+    <div class="colophon">
+      <p class="label">Ark Jester D. Yañez — <span id="year"></span></p>
+      <p><a class="label" href="#top">Back to top</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Scroll reveals — IntersectionObserver only, never a scroll listener. */
+  var revealables = document.querySelectorAll("[data-reveal]");
+  if (reduced || !("IntersectionObserver" in window)) {
+    revealables.forEach(function (el) { el.classList.add("is-in"); });
+  } else {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-in");
+        revealObserver.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.1 });
+    revealables.forEach(function (el) { revealObserver.observe(el); });
+  }
+
+  /* Hairline under the sticky nav, once the hero has scrolled past. */
+  var sentinel = document.getElementById("stick-sentinel");
+  var masthead = document.getElementById("masthead");
+  if (sentinel && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      masthead.classList.toggle("is-stuck", !entries[0].isIntersecting);
+    }).observe(sentinel);
+  }
+
+  /* Which nav link is current. */
+  var navLinks = document.querySelectorAll("[data-nav]");
+  if (navLinks.length && "IntersectionObserver" in window) {
+    var navObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach(function (link) {
+          link.setAttribute("aria-current", String(link.dataset.nav === entry.target.id));
+        });
+      });
+    }, { rootMargin: "-45% 0px -45% 0px" });
+    navLinks.forEach(function (link) {
+      var section = document.getElementById(link.dataset.nav);
+      if (section) navObserver.observe(section);
+    });
+  }
+
+  document.getElementById("year").textContent = String(new Date().getFullYear());
+
+  var left = document.querySelectorAll(".ph").length;
+  if (left) {
+    console.info(
+      "Portfolio — " + left + " placeholder" + (left === 1 ? "" : "s") + " left to replace.\n" +
+      "Find them with:  document.querySelectorAll('.ph')"
+    );
+  }
+})();
+</script>
+
+</body>
+</html>
