@@ -443,6 +443,12 @@ img{ display: block; max-width: 100%; height: auto; }
 @media (min-width: 900px){
   .project{ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--gutter); }
   .project:nth-child(even) .project__media{ order: 2; }
+  /* A node graph in half a column is a texture, not a diagram. These two
+     break the zig-zag and run the canvas full width, copy underneath. */
+  .project--wide{ grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
+  /* Beats the nth-child(even) flip above, which would put the copy first. */
+  .project.project--wide .project__media{ order: 0; }
+  .project--wide .project__body{ max-width: 68ch; }
 }
 
 /* Plate = CSS placeholder. Drop a real <img> in and it covers this. */
@@ -468,6 +474,29 @@ img{ display: block; max-width: 100%; height: auto; }
 .plate.has-shot .plate__label{ display: none; }
 /* Portrait phone captures are shown whole rather than cropped to 16:10. */
 .plate--fit img{ object-fit: contain; object-position: center; padding: var(--s-4); }
+/* Node graphs read left to right and lose their meaning if cropped, so they
+   get a wider plate and are contained inside it rather than covering it. */
+.plate--wide{ aspect-ratio: 2.4 / 1; }
+/* The plate textures below are for empty placeholders. Over a wiring diagram
+   they land on top of the connectors and read as part of the graph. */
+.plate--wide::after{ display: none; }
+/* Below the two-column breakpoint the canvas cannot shrink to a phone and stay
+   readable, so it scrolls inside its own plate. The page never scrolls. */
+.plate__hint{ display: none; }
+@media (max-width: 899px){
+  .plate--wide{
+    display: block; aspect-ratio: auto; padding: 0;
+    overflow-x: auto; overscroll-behavior-x: contain;
+  }
+  .plate--wide img{
+    position: static;
+    width: 860px; max-width: none; height: auto;
+    padding: 0;
+  }
+  /* A clipped edge alone does not read as scrollable, so say it in words. A
+     gradient fade would have to live inside the scroller and travel with it. */
+  .plate__hint{ display: block; margin-top: var(--s-3); color: var(--text-faint); }
+}
 .plate__num{
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 6vw, 3.75rem);
@@ -516,6 +545,17 @@ img{ display: block; max-width: 100%; height: auto; }
     repeating-linear-gradient(0deg,  transparent 0 21px, var(--line) 21px 22px),
     radial-gradient(var(--line-strong) 1.3px, transparent 1.3px);
   background-size: auto, 22px 22px;
+}
+.plate--08{ background: linear-gradient(120deg, var(--bg-sunk) 0%, var(--bg-raise) 60%, var(--accent-wash) 100%); }
+.plate--08::after{
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+.plate--09{ background: radial-gradient(circle at 62% 42%, var(--accent-wash) 0%, var(--bg-sunk) 58%); }
+.plate--09::after{
+  background: repeating-linear-gradient(115deg, transparent 0 16px, var(--line) 16px 17px);
 }
 
 .project__body{ display: grid; gap: var(--s-4); }
@@ -718,12 +758,14 @@ img{ display: block; max-width: 100%; height: auto; }
     <span class="marquee__item">DLMS / COSEM<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
     <span class="marquee__item">ASP.NET Core &amp; Laravel<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
     <span class="marquee__item">RAG &amp; local LLM<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">AI agents on n8n<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
     <span class="marquee__item">Billing systems<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
     <span class="marquee__item">Meter reading<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
     <span class="marquee__item">AMI / HES integration<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
     <span class="marquee__item">DLMS / COSEM<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
     <span class="marquee__item">ASP.NET Core &amp; Laravel<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
     <span class="marquee__item">RAG &amp; local LLM<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
+    <span class="marquee__item">AI agents on n8n<svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4L12 0z"/></svg></span>
   </div>
 </div>
 
@@ -808,10 +850,10 @@ img{ display: block; max-width: 100%; height: auto; }
     <div class="shell">
       <div class="sec-head">
         <p class="label label--accent">Selected work</p>
-        <h2 id="work-h">Seven systems in production at a utility.</h2>
+        <h2 id="work-h">Seven systems at a utility, and two agents on top of them.</h2>
         <p class="sec-head__note">
-          Meter to bill, pole to payroll. Each one below is running; the lime line on
-          each is the outcome only you can fill in.
+          Meter to bill, pole to payroll — then the same records answered in plain language
+          over chat. The lime line on each is the outcome only you can fill in.
 </p>
       </div>
 
@@ -991,6 +1033,60 @@ img{ display: block; max-width: 100%; height: auto; }
               mechanics, with registration, insurance, battery and tire replacement surfaced
               as things coming due rather than things already missed.
 </p>
+          </div>
+        </article>
+
+        <article class="project project--wide" data-reveal>
+          <div class="project__media">
+            <div class="plate plate--08 plate--fit plate--wide has-shot">
+              <span class="plate__num">08</span>
+              <span class="plate__label">Consumer AI agent</span>
+              <img src="images/n8n-mobile-agent.png" width="1462" height="544" loading="lazy" decoding="async"
+                   alt="n8n workflow: a webhook and validation step feeding a rules switch, one branch reading a Google Doc into a Gemini agent, the other fanning out to CONSUMERS, ARREARS and PAYMENT queries that merge into a second agent before both respond to the webhook.">
+            </div>
+              <p class="label plate__hint">Swipe the canvas to follow the flow &rarr;</p>
+          </div>
+          <div class="project__body">
+            <div class="project__eyebrow">
+              <p class="label">n8n</p>
+            </div>
+            <h3>Consumer account agent for the mobile app</h3>
+            <p class="project__problem">
+              One webhook behind the mobile app, validated and then split on rules. Account
+              questions fan out to three parameterised queries — consumers, arrears, payment —
+              which merge, get mapped and repaired in a code step, then go to a Gemini agent
+              with conversation memory and a reasoning tool. Policy questions take the other
+              branch and are answered from a Google Doc instead. The database does the
+              lookup; the model only has to phrase the answer.
+</p>
+            <p class="label">n8n · Google Gemini</p>
+          </div>
+        </article>
+
+        <article class="project project--wide" data-reveal>
+          <div class="project__media">
+            <div class="plate plate--09 plate--fit plate--wide has-shot">
+              <span class="plate__num">09</span>
+              <span class="plate__label">FB Page agent</span>
+              <img src="images/n8n-fb-agent.png" width="1348" height="632" loading="lazy" decoding="async"
+                   alt="n8n workflow: one webhook serving Facebook's GET verification on one branch, and on the other filtering message events, normalising fields, incrementing a Redis counter, then branching between a Gemini agent answering from a Google Doc and a direct HTTP reply.">
+            </div>
+              <p class="label plate__hint">Swipe the canvas to follow the flow &rarr;</p>
+          </div>
+          <div class="project__body">
+            <div class="project__eyebrow">
+              <p class="label">n8n</p>
+            </div>
+            <h3>Facebook Page agent</h3>
+            <p class="project__problem">
+              A single webhook doing two jobs: answering Facebook's GET verification
+              handshake, and taking POSTed message events on the other branch. Events are
+              filtered, normalised, and counted in Redis — with its own error path, so a
+              cache miss does not swallow the message. The counter decides the route:
+              either a Gemini agent answering with memory and a Google Doc for context,
+              or a direct reply. Both go back out through the Send API.
+</p>
+            <p class="label">n8n · Google Gemini · Redis · Meta Send API</p>
           </div>
         </article>
 
